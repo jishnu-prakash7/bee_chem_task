@@ -1,78 +1,64 @@
-import 'dart:convert';
+import 'package:g3_interactive_task/features/personnel_list/domain/entities/personnel_list_entity.dart';
 
-import 'package:flutter/foundation.dart';
-
-PersonnelListModel personnelListModelFromJson(String str) =>
-    PersonnelListModel.fromJson(json.decode(str));
-
-String personnelListModelToJson(PersonnelListModel data) =>
-    json.encode(data.toJson());
-
-class PersonnelListModel {
-  bool status;
-  List<PersonnelListDatum> data;
-
+class PersonnelListModel extends PersonnelListEntity {
   PersonnelListModel({
-    required this.status,
-    required this.data,
+    required super.status,
+    required super.data,
   });
 
   factory PersonnelListModel.fromJson(Map<String, dynamic> json) =>
       PersonnelListModel(
-        status: json["status"] ?? kFlutterMemoryAllocationsEnabled,
-        data: List<PersonnelListDatum>.from(
-            (json["data"] ?? []).map((x) => PersonnelListDatum.fromJson(x))),
+        status: json["status"] ?? false,
+        data: List<PersonnelListDatumModel>.from(
+          (json["data"] ?? []).map((x) => PersonnelListDatumModel.fromJson(x)),
+        ),
+      );
+
+  factory PersonnelListModel.fromEntity(PersonnelListEntity entity) =>
+      PersonnelListModel(
+        status: entity.status,
+        data: entity.data
+            .map((datum) => PersonnelListDatumModel.fromEntity(datum))
+            .toList(),
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+        "data": List<dynamic>.from(
+          data.map((x) => (x as PersonnelListDatumModel).toJson()),
+        ),
       };
+
+  PersonnelListEntity toEntity() => PersonnelListEntity(
+        status: status,
+        data: data,
+      );
 }
 
-class PersonnelListDatum {
-  int id;
-  String firstName;
-  String lastName;
-  String address;
-  String latitude;
-  String longitude;
-  String suburb;
-  String state;
-  String postcode;
-  String country;
-  String contactNumber;
-  String additionalNotes;
-  String status;
-  String roleIds;
-  String createdBy;
-  String? updatedBy;
-  List<RoleDetail> roleDetails;
-  List<String> apiaryRoleArray;
-
-  PersonnelListDatum({
-    required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.address,
-    required this.latitude,
-    required this.longitude,
-    required this.suburb,
-    required this.state,
-    required this.postcode,
-    required this.country,
-    required this.contactNumber,
-    required this.additionalNotes,
-    required this.status,
-    required this.roleIds,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.roleDetails,
-    required this.apiaryRoleArray,
+class PersonnelListDatumModel extends PersonnelListDatumEntity {
+  PersonnelListDatumModel({
+    required super.id,
+    required super.firstName,
+    required super.lastName,
+    required super.address,
+    required super.latitude,
+    required super.longitude,
+    required super.suburb,
+    required super.state,
+    required super.postcode,
+    required super.country,
+    required super.contactNumber,
+    required super.additionalNotes,
+    required super.status,
+    required super.roleIds,
+    required super.createdBy,
+    required super.updatedBy,
+    required super.roleDetails,
+    required super.apiaryRoleArray,
   });
 
-  factory PersonnelListDatum.fromJson(Map<String, dynamic> json) =>
-      PersonnelListDatum(
+  factory PersonnelListDatumModel.fromJson(Map<String, dynamic> json) =>
+      PersonnelListDatumModel(
         id: json["id"] ?? 0,
         firstName: json["first_name"] ?? '',
         lastName: json["last_name"] ?? '',
@@ -88,11 +74,37 @@ class PersonnelListDatum {
         status: json["status"] ?? '',
         roleIds: json["role_ids"] ?? '',
         createdBy: json["created_by"] ?? '',
-        updatedBy: json["updated_by"] ?? '',
-        roleDetails: List<RoleDetail>.from(
-            (json["role_details"] ?? []).map((x) => RoleDetail.fromJson(x))),
-        apiaryRoleArray:
-            List<String>.from((json["apiary_role_array"] ?? []).map((x) => x)),
+        updatedBy: json["updated_by"],
+        roleDetails: List<RoleDetailModel>.from(
+          (json["role_details"] ?? []).map((x) => RoleDetailModel.fromJson(x)),
+        ),
+        apiaryRoleArray: List<String>.from(
+          (json["apiary_role_array"] ?? []).map((x) => x.toString()),
+        ),
+      );
+
+  factory PersonnelListDatumModel.fromEntity(PersonnelListDatumEntity entity) =>
+      PersonnelListDatumModel(
+        id: entity.id,
+        firstName: entity.firstName,
+        lastName: entity.lastName,
+        address: entity.address,
+        latitude: entity.latitude,
+        longitude: entity.longitude,
+        suburb: entity.suburb,
+        state: entity.state,
+        postcode: entity.postcode,
+        country: entity.country,
+        contactNumber: entity.contactNumber,
+        additionalNotes: entity.additionalNotes,
+        status: entity.status,
+        roleIds: entity.roleIds,
+        createdBy: entity.createdBy,
+        updatedBy: entity.updatedBy,
+        roleDetails: entity.roleDetails
+            .map((role) => RoleDetailModel.fromEntity(role))
+            .toList(),
+        apiaryRoleArray: entity.apiaryRoleArray,
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,27 +124,59 @@ class PersonnelListDatum {
         "role_ids": roleIds,
         "created_by": createdBy,
         "updated_by": updatedBy,
-        "role_details": List<dynamic>.from(roleDetails.map((x) => x.toJson())),
+        "role_details": List<dynamic>.from(
+          roleDetails.map((x) => (x as RoleDetailModel).toJson()),
+        ),
         "apiary_role_array": List<dynamic>.from(apiaryRoleArray.map((x) => x)),
       };
+
+  PersonnelListDatumEntity toEntity() => PersonnelListDatumEntity(
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        suburb: suburb,
+        state: state,
+        postcode: postcode,
+        country: country,
+        contactNumber: contactNumber,
+        additionalNotes: additionalNotes,
+        status: status,
+        roleIds: roleIds,
+        createdBy: createdBy,
+        updatedBy: updatedBy,
+        roleDetails: roleDetails,
+        apiaryRoleArray: apiaryRoleArray,
+      );
 }
 
-class RoleDetail {
-  int id;
-  String role;
-
-  RoleDetail({
-    required this.id,
-    required this.role,
+class RoleDetailModel extends RoleDetailEntity {
+  RoleDetailModel({
+    required super.id,
+    required super.role,
   });
 
-  factory RoleDetail.fromJson(Map<String, dynamic> json) => RoleDetail(
+  factory RoleDetailModel.fromJson(Map<String, dynamic> json) =>
+      RoleDetailModel(
         id: json["id"] ?? 0,
         role: json["role"] ?? '',
+      );
+
+  factory RoleDetailModel.fromEntity(RoleDetailEntity entity) =>
+      RoleDetailModel(
+        id: entity.id,
+        role: entity.role,
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "role": role,
       };
+
+  RoleDetailEntity toEntity() => RoleDetailEntity(
+        id: id,
+        role: role,
+      );
 }

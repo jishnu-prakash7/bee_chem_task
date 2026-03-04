@@ -1,8 +1,18 @@
 part of 'dependencies.dart';
 
 injectBlocs() {
-  sl.registerSingleton(AuthBloc());
-  sl.registerSingleton(PersonnelListBloc());
-  sl.registerSingleton(PersonnelFormBloc());
+  //Auth Bloc
+  sl.registerSingleton(
+    AuthBloc(),
+  );
+
+  //Personnel List Bloc
+  sl.registerSingleton(
+    PersonnelListBloc(),
+  );
+
+  //Personnel Form Bloc
+  sl.registerSingleton(
+    PersonnelFormBloc(),
+  );
 }
-  

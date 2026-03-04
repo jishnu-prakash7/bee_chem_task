@@ -21,12 +21,14 @@ class SharedPrefsData {
       {required String? token, required String? email}) async {
     final prefs = await SharedPreferences.getInstance();
 
-    bool isRememberUser = token != null && token.isNotEmpty;
+    // bool isRememberUser = token != null && token.isNotEmpty;
+    bool saveEmail =
+        token != null && token.isNotEmpty && email != null && email.isNotEmpty;
 
-    if (email != null) {
+    if (saveEmail) {
       await prefs.setString(_userEmail, email);
+      // await prefs.setBool(_isRememberUserKey, isRememberUser);
     }
-    await prefs.setBool(_isRememberUserKey, isRememberUser);
   }
 
   static Future<bool> isRememberUser() async {
@@ -48,6 +50,10 @@ class SharedPrefsData {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_isRememberUserKey);
     await prefs.remove(_tokenKey);
+    await prefs.remove(_userEmail);
+  }
+  static Future<void> clearEmail() async {
+    final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userEmail);
   }
 }

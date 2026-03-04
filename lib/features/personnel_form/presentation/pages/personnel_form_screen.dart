@@ -6,11 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:g3_interactive_task/core/constants/fetch_location.dart';
 import 'package:g3_interactive_task/core/dependencies/dependencies.dart';
 import 'package:g3_interactive_task/core/size_helper/size_helper.dart';
-import 'package:g3_interactive_task/features/personnel_form/data/models/fetch_role_list_model.dart';
+import 'package:g3_interactive_task/features/personnel_form/domain/entities/fetch_role_list_entity.dart';
 import 'package:g3_interactive_task/features/personnel_form/presentation/bloc/personnel_form_bloc.dart';
 import 'package:g3_interactive_task/features/personnel_form/presentation/widgets/address_field.dart';
 import 'package:g3_interactive_task/features/personnel_form/presentation/widgets/common_name_field.dart';
 import 'package:g3_interactive_task/features/personnel_form/presentation/widgets/notes_field.dart';
+import 'package:g3_interactive_task/features/personnel_list/presentation/bloc/personnel_list_bloc.dart';
 import 'package:g3_interactive_task/shared/common_widgets/custom_snackbar.dart';
 import 'package:g3_interactive_task/shared/common_widgets/custom_text.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,7 +34,7 @@ class _PersonnelFormScreenState extends State<PersonnelFormScreen> {
   final TextEditingController _countryController = TextEditingController();
 
   bool _status = true;
-  FetchRoleListModel? _selectedRole;
+  FetchRoleListEntity? _selectedRole;
 
   Position? position;
 
@@ -104,8 +105,7 @@ class _PersonnelFormScreenState extends State<PersonnelFormScreen> {
         bloc: sl<PersonnelFormBloc>(),
         listener: (context, state) {
           if (state is AddPersonnelDataSuccessState) {
-            customSnackbar(context, "Personnel details added successfully.");
-            Navigator.pop(context);
+            sl<PersonnelListBloc>().add(FetchPersonnelListEvent());
             _fullNameController.clear();
             _addressController.clear();
             _suburbController.clear();
@@ -114,6 +114,8 @@ class _PersonnelFormScreenState extends State<PersonnelFormScreen> {
             _contactController.clear();
             _notesController.clear();
             _countryController.clear();
+            customSnackbar(context, "Personnel details added successfully.");
+            Navigator.pop(context);
           } else if (state is AddPersonnelDataFailedState) {
             customSnackbar(
                 context, "Failed to add personnel details. Please try again.");

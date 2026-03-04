@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:g3_interactive_task/core/constants/api_functions.dart';
-import 'package:g3_interactive_task/features/personnel_form/data/models/fetch_role_list_model.dart';
+import 'package:g3_interactive_task/core/dependencies/dependencies.dart';
+import 'package:g3_interactive_task/features/personnel_form/domain/entities/fetch_role_list_entity.dart';
+import 'package:g3_interactive_task/features/personnel_form/domain/use_cases/add_personnel_details_use_case.dart';
+import 'package:g3_interactive_task/features/personnel_form/domain/use_cases/fetch_role_list_use_case.dart';
 
 part 'personnel_form_event.dart';
 part 'personnel_form_state.dart';
@@ -19,12 +20,12 @@ class PersonnelFormBloc extends Bloc<PersonnelFormEvent, PersonnelFormState> {
       FetchRoleListEvent event, Emitter<PersonnelFormState> emit) async {
     try {
       emit(FetchRoleListLoadingState());
-      Response response = await ApiFunctions().fetchRoleList();
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        List<FetchRoleListModel> roleList = (response.data as List)
-            .map((json) => FetchRoleListModel.fromJson(json))
-            .toList();
-        emit(FetchRoleListSuccessState(roleList: roleList));
+
+      final result = await sl<FetchRoleListUseCase>().call();
+      if (result.error != null) {
+        emit(FetchRoleListFailedState(error: result.error!.message));
+      } else {
+        emit(FetchRoleListSuccessState(roleList: result.data!));
       }
     } catch (e) {
       emit(FetchRoleListFailedState(error: e.toString()));
@@ -35,19 +36,23 @@ class PersonnelFormBloc extends Bloc<PersonnelFormEvent, PersonnelFormState> {
       AddPersonnelDataEvent event, Emitter<PersonnelFormState> emit) async {
     try {
       emit(AddPersonnelDataLoadingState());
-      Response response = await ApiFunctions().addPersonnelData(
-          firstName:event. firstName,
-          address: event.address, 
-          latitude:event. latitude,
-          longitude:event. longitude,
-          suburb:event. suburb,
-          state: event.state,
-          postcode:event. postcode,
-          country:event. country,
-          contactNumber:event. contactNumber,
-          roleIds:event. roleIds,
-          status:event. status);
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final result = await sl<AddPersonnelDetailsUseCase>().call(
+          params: AddPersonnelDetailsParams(
+              firstName: event.firstName,
+              address: event.address,
+              latitude: event.latitude,
+              longitude: event.longitude,
+              suburb: event.suburb,
+              state: event.state,
+              postcode: event.postcode,
+              country: event.country,
+              contactNumber: event.contactNumber,
+              roleIds: event.roleIds,
+              status: event.status));
+
+      if (result.error != null) {
+        emit(AddPersonnelDataFailedState(error: result.error!.message));
+      } else {
         emit(AddPersonnelDataSuccessState());
       }
     } catch (e) {

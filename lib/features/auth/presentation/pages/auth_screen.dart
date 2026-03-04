@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:g3_interactive_task/core/constants/shared_preferences.dart';
 import 'package:g3_interactive_task/core/dependencies/dependencies.dart';
 import 'package:g3_interactive_task/core/size_helper/size_helper.dart';
 import 'package:g3_interactive_task/features/auth/presentation/bloc/auth_bloc.dart';
@@ -18,8 +19,24 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe = true;
-  bool _obscurePassword = true;
+  ValueNotifier<bool> rememberMe = ValueNotifier(false);
+  ValueNotifier<bool> obscurePassword = ValueNotifier(true);
+
+  // bool obscurePassword = true;
+
+  @override
+  void initState() {
+    isRememberUser();
+    super.initState();
+  }
+
+  Future<void> isRememberUser() async {
+    final email = await SharedPrefsData.getEmail();
+    if (email != null && email.isNotEmpty) {
+      _emailController.text = email;
+      rememberMe.value = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -87,35 +104,37 @@ class _LoginScreenState extends State<LoginScreen> {
                         icon: Icons.email_outlined,
                       ),
                       SizedBox(height: sl<SizeHelper>().getWidgetHeight(16)),
-                      customTextField(
-                        controller: _passwordController,
-                        hintText: "Password",
-                        icon: Icons.lock_outline,
-                        obscure: _obscurePassword,
-                        onToggle: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      ),
+                      ListenableBuilder(
+                          listenable: obscurePassword,
+                          builder: (context, child) {
+                            return customTextField(
+                              controller: _passwordController,
+                              hintText: "Password",
+                              icon: Icons.lock_outline,
+                              obscure: obscurePassword.value,
+                              onToggle: () => obscurePassword.value =
+                                  !obscurePassword.value,
+                            );
+                          }),
                       SizedBox(height: sl<SizeHelper>().getWidgetHeight(5)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Checkbox(
-                                value: _rememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
-                                },
-                                activeColor: const Color(0xFFFDD835),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
+                              ListenableBuilder(
+                                  listenable: rememberMe,
+                                  builder: (context, child) {
+                                    return Checkbox(
+                                      value: rememberMe.value,
+                                      onChanged: (value) =>
+                                          rememberMe.value = value ?? false,
+                                      activeColor: const Color(0xFFFDD835),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    );
+                                  }),
                               CustomText(
                                 fontSize: sl<SizeHelper>().getTextSize(14),
                                 text: "Remember me",
@@ -178,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     "Password cannot be less than 6 characters");
                               } else {
                                 sl<AuthBloc>().add(LoginEvent(
-                                    isRememberUser: _rememberMe,
+                                    isRememberUser: rememberMe.value,
                                     email: _emailController.text.trim(),
                                     password: _passwordController.text.trim()));
                               }

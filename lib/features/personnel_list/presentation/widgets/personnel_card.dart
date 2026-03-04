@@ -1,12 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:g3_interactive_task/core/dependencies/dependencies.dart';
 import 'package:g3_interactive_task/core/size_helper/size_helper.dart';
-import 'package:g3_interactive_task/features/personnel_list/data/models/personnel_list_model.dart';
+import 'package:g3_interactive_task/features/personnel_list/domain/entities/personnel_list_entity.dart';
 import 'package:g3_interactive_task/shared/common_widgets/custom_text.dart';
 
 class PersonnelCard extends StatelessWidget {
-  final PersonnelListDatum personnel;
+  final PersonnelListDatumEntity personnel;
 
   const PersonnelCard({super.key, required this.personnel});
 
@@ -51,11 +50,15 @@ class PersonnelCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomText(
-                          fontSize: sl<SizeHelper>().getTextSize(15),
-                          text: personnel.firstName,
-                          textColor: Colors.black,
-                          fontWeight: FontWeight.bold,
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: sl<SizeHelper>().kWidth/2.5),
+                          child: CustomText(
+                            overflow: TextOverflow.ellipsis,  
+                            fontSize: sl<SizeHelper>().getTextSize(15),
+                            text: personnel.firstName,
+                            textColor: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(
@@ -168,4 +171,3 @@ class PersonnelCard extends StatelessWidget {
     );
   }
 }
-

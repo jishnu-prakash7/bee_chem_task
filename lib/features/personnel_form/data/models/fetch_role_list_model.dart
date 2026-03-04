@@ -1,23 +1,9 @@
-// To parse this JSON data, do
-//
-//     final fetchRoleListModel = fetchRoleListModelFromJson(jsonString);
+import 'package:g3_interactive_task/features/personnel_form/domain/entities/fetch_role_list_entity.dart';
 
-import 'dart:convert';
-
-List<FetchRoleListModel> fetchRoleListModelFromJson(String str) =>
-    List<FetchRoleListModel>.from(
-        json.decode(str).map((x) => FetchRoleListModel.fromJson(x)));
-
-String fetchRoleListModelToJson(List<FetchRoleListModel> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
-class FetchRoleListModel {
-  int id;
-  String role;
-
+class FetchRoleListModel extends FetchRoleListEntity {
   FetchRoleListModel({
-    required this.id,
-    required this.role,
+    required super.id,
+    required super.role,
   });
 
   factory FetchRoleListModel.fromJson(Map<String, dynamic> json) =>
@@ -25,9 +11,18 @@ class FetchRoleListModel {
         id: json["id"] ?? 0,
         role: json["role"] ?? '',
       );
+  factory FetchRoleListModel.fromEntity(FetchRoleListEntity entity) =>
+      FetchRoleListModel(
+        id: entity.id,
+        role: entity.role,
+      );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "role": role,
-      };
+      }; 
+  FetchRoleListEntity toEntity() => FetchRoleListEntity(
+        id: id,
+        role: role,
+      );
 }

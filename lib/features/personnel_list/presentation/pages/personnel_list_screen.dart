@@ -29,7 +29,7 @@ class _PersonnelListScreenState extends State<PersonnelListScreen> {
   void _filterPersonnel(String query) {
     setState(() {
       sl<PersonnelListBloc>().filteredPersonnel =
-          sl<PersonnelListBloc>().personnelListData.data.where((person) {
+          sl<PersonnelListBloc>().personnelList.where((person) {
         return person.firstName.toLowerCase().contains(query.toLowerCase());
       }).toList();
     });

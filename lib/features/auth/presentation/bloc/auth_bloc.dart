@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:g3_interactive_task/core/constants/api_functions.dart';
 import 'package:g3_interactive_task/core/constants/shared_preferences.dart';
+import 'package:g3_interactive_task/core/dependencies/dependencies.dart';
+import 'package:g3_interactive_task/features/auth/domain/use_cases/login_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -18,21 +17,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FutureOr<void> loginEvent(LoginEvent event, Emitter<AuthState> emit) async {
     try {
       emit(LoginLoadingState());
-      Response response = await ApiFunctions()
-          .login(email: event.email, password: event.password);
-      log('login response is $response');
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (response.data["status"] == true) {
-          await SharedPrefsData.saveUserToken(
-              token: response.data["access_token"]);
-          if (event.isRememberUser) {
-            await SharedPrefsData.rememberUser(
-                email: event.email, token: response.data["access_token"]);
-          }
-          emit(LoginSuccessState());
+
+      final result = await sl<LoginUseCase>().call(
+          params: LoginParams(email: event.email, password: event.password));
+
+      if (result.error != null) {
+        emit(LoginFailedState(error: result.error!.message));
+      } else {
+        await SharedPrefsData.saveUserToken(token: result.data!.accessToken);
+        if (event.isRememberUser) {
+          await SharedPrefsData.rememberUser(
+              email: event.email, token: result.data!.accessToken);
         } else {
-          emit(LoginFailedState(error: response.data["message"]));
+          await SharedPrefsData.clearEmail();
         }
+        emit(LoginSuccessState());
       }
     } catch (e) {
       emit(LoginFailedState(error: e.toString()));

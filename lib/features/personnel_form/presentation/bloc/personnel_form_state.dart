@@ -7,7 +7,7 @@ final class PersonnelFormInitial extends PersonnelFormState {}
 final class FetchRoleListLoadingState extends PersonnelFormState {}
 
 final class FetchRoleListSuccessState extends PersonnelFormState {
-  final List<FetchRoleListModel> roleList;
+  final List<FetchRoleListEntity> roleList;
 
   FetchRoleListSuccessState({required this.roleList});
 }

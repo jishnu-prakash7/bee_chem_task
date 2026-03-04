@@ -10,5 +10,5 @@ class ApiEndPoints {
   static const String login = "/login";
   static const String personnelDetailsAdd = "/add";
   static const String roleList = "/apiary-roles";
- 
+
 }
